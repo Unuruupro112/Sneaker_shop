@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOLE — Пүүз Дэлгүүр</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f0eb;
+    --accent: #ff3c00;
+    --gray: #1a1a1a;
+    --mid: #333;
+    --light: #888;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+  }
+  .cursor-follow {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,60,0,0.4);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.35s ease;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 48px;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 6px;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--light);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--white); }
+
+  .nav-cart {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 10px 20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: none;
+    transition: background 0.2s;
+  }
+  .nav-cart:hover { background: #e03500; }
+
+  /* PAGES */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ===== HOME PAGE ===== */
+  .hero {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-tag {
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 8vw, 120px);
+    line-height: 0.92;
+    color: var(--white);
+    margin-bottom: 32px;
+  }
+
+  .hero-title .outline {
+    -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+    color: transparent;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: var(--light);
+    line-height: 1.7;
+    max-width: 360px;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  .hero-btns { display: flex; gap: 16px; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 16px 36px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #e03500; transform: translateY(-2px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 16px 36px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--white); }
+
+  .hero-right {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28vw;
+    color: rgba(255,255,255,0.025);
+    letter-spacing: -10px;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .hero-shoe {
+    width: 90%;
+    max-width: 520px;
+    filter: drop-shadow(0 40px 80px rgba(255,60,0,0.3));
+    animation: float 4s ease-in-out infinite;
+    position: relative;
+    z-index: 2;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-8deg); }
+    50% { transform: translateY(-20px) rotate(-5deg); }
+  }
+
+  .hero-stats {
+    position: absolute;
+    bottom: 48px;
+    left: 48px;
+    display: flex;
+    gap: 48px;
+  }
+  .stat-item { }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: var(--white);
+    line-height: 1;
+  }
+  .stat-num span { color: var(--accent); }
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--light);
+    font-weight: 500;
+  }
+
+  /* MARQUEE */
+  .marquee-bar {
+    background: var(--accent);
+    padding: 14px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .marquee-inner {
+    display: inline-block;
+    animation: marquee 20s linear infinite;
+  }
+  .marquee-inner span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 4px;
+    color: var(--white);
+    margin-right: 64px;
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* FEATURED */
+  .section { padding: 100px 48px; }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 60px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--white);
+  }
+  .section-title span { color: var(--accent); }
+  .section-sub {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--light);
+    text-transform: uppercase;
+    cursor: none;
+    border-bottom: 1px solid var(--light);
+    padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .section-sub:hover { color: var(--white); border-color: var(--white); }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .product-card {
+    background: var(--gray);
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    group: true;
+  }
+
+  .product-card:hover .product-img-wrap img {
+    transform: scale(1.08) rotate(-3deg);
+  }
+
+  .product-card:hover .product-overlay {
+    opacity: 1;
+  }
+
+  .product-img-wrap {
+    height: 280px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .product-img-wrap img {
+    width: 80%;
+    transition: transform 0.5s ease;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--accent);
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+  }
+
+  .product-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,60,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .overlay-btn {
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 12px 28px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: none;
+    transform: translateY(10px);
+    transition: transform 0.3s;
+  }
+  .product-card:hover .overlay-btn { transform: translateY(0); }
+
+  .product-info {
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .product-brand {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .product-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .product-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .product-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--white);
+  }
+  .product-price .currency {
+    font-size: 14px;
+    color: var(--light);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    margin-right: 2px;
+  }
+
+  .add-btn {
+    width: 36px; height: 36px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--white);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .add-btn:hover { background: var(--accent); border-color: var(--accent); }
+
+  /* BANNER STRIP */
+  .banner-strip {
+    margin: 0 48px;
+    background: var(--gray);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .banner-content {
+    padding: 80px 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .banner-tag {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .banner-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    line-height: 0.95;
+    margin-bottom: 24px;
+  }
+
+  .banner-desc {
+    color: var(--light);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 320px;
+    margin-bottom: 36px;
+    font-weight: 300;
+  }
+
+  .banner-img {
+    background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .banner-img img {
+    width: 85%;
+    filter: drop-shadow(0 30px 60px rgba(255,60,0,0.25));
+    transform: rotate(10deg);
+    animation: float2 5s ease-in-out infinite;
+  }
+
+  @keyframes float2 {
+    0%, 100% { transform: rotate(10deg) translateY(0); }
+    50% { transform: rotate(7deg) translateY(-15px); }
+  }
+
+  .banner-img::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(255,60,0,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  /* ===== CATALOG PAGE ===== */
+  .catalog-hero {
+    padding: 140px 48px 60px;
+    background: linear-gradient(to bottom, var(--gray), var(--black));
+  }
+  .catalog-hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 100px;
+    line-height: 0.9;
+    color: var(--white);
+  }
+  .catalog-hero h1 span { color: var(--accent); }
+  .catalog-hero p {
+    color: var(--light);
+    font-size: 14px;
+    margin-top: 16px;
+    letter-spacing: 2px;
+  }
+
+  .catalog-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 0;
+    padding: 0 48px 80px;
+  }
+
+  .filters {
+    padding: 40px 0 40px 0;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    padding-right: 40px;
+  }
+
+  .filter-group { margin-bottom: 40px; }
+  .filter-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--light);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .filter-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    cursor: none;
+  }
+  .filter-item input[type="checkbox"] { accent-color: var(--accent); }
+  .filter-item label {
+    font-size: 14px;
+    color: var(--white);
+    cursor: none;
+    transition: color 0.2s;
+  }
+  .filter-item:hover label { color: var(--accent); }
+
+  .price-range { margin-top: 12px; }
+  .range-input {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: none;
+  }
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--light);
+  }
+
+  .catalog-products {
+    padding: 40px 0 40px 48px;
+  }
+
+  .catalog-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 36px;
+  }
+  .result-count {
+    font-size: 13px;
+    color: var(--light);
+    letter-spacing: 1px;
+  }
+  .sort-select {
+    background: var(--gray);
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    cursor: none;
+    outline: none;
+  }
+
+  .catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  /* ===== ABOUT PAGE ===== */
+  .about-hero {
+    height: 70vh;
+    display: flex;
+    align-items: flex-end;
+    padding: 80px 48px;
+    position: relative;
+    overflow: hidden;
+    background: var(--gray);
+    margin-top: 80px;
+  }
+
+  .about-hero::before {
+    content: 'SOLE';
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40vw;
+    color: rgba(255,255,255,0.03);
+    position: absolute;
+    right: -5vw;
+    top: 50%;
+    transform: translateY(-50%);
+    letter-spacing: -20px;
+    user-select: none;
+  }
+
+  .about-hero-content { position: relative; z-index: 2; }
+  .about-hero-content h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 8vw, 110px);
+    line-height: 0.9;
+    margin-bottom: 24px;
+  }
+  .about-hero-content h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .about-hero-content p {
+    font-size: 16px;
+    color: var(--light);
+    max-width: 500px;
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin: 2px;
+  }
+
+  .about-block {
+    background: var(--gray);
+    padding: 64px;
+  }
+
+  .about-block h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--white);
+    margin-bottom: 20px;
+    line-height: 1;
+  }
+  .about-block h2 span { color: var(--accent); }
+
+  .about-block p {
+    font-size: 14px;
+    color: var(--light);
+    line-height: 1.9;
+    font-weight: 300;
+  }
+
+  .about-block.dark {
+    background: var(--accent);
+  }
+  .about-block.dark h2,
+  .about-block.dark p { color: var(--white); }
+
+  .values-list { list-style: none; margin-top: 24px; }
+  .values-list li {
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 14px;
+    color: var(--white);
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .values-list li::before {
+    content: '→';
+    color: var(--accent);
+    font-size: 16px;
+  }
+  .about-block.dark .values-list li::before { color: var(--white); }
+
+  .team-section { padding: 100px 48px; }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+  .team-card {
+    background: var(--gray);
+    overflow: hidden;
+  }
+  .team-avatar {
+    height: 200px;
+    background: linear-gradient(135deg, #222, #2a2a2a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    color: rgba(255,255,255,0.1);
+  }
+  .team-info { padding: 20px 24px; }
+  .team-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .team-role {
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ===== CONTACT PAGE ===== */
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+    padding-top: 80px;
+  }
+
+  .contact-left {
+    background: var(--accent);
+    padding: 80px 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .contact-left h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 6vw, 90px);
+    line-height: 0.9;
+    color: var(--white);
+    margin-bottom: 32px;
+  }
+
+  .contact-left p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.8;
+    font-weight: 300;
+    margin-bottom: 48px;
+    max-width: 360px;
+  }
+
+  .contact-details { list-style: none; }
+  .contact-details li {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .contact-details .c-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    font-weight: 600;
+  }
+  .contact-details .c-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 1px;
+  }
+
+  .contact-right {
+    background: var(--gray);
+    padding: 80px 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .contact-right h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--white);
+    margin-bottom: 40px;
+  }
+
+  .form-group { margin-bottom: 24px; }
+  .form-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--light);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--white);
+    padding: 14px 18px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus,
+  .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: none; height: 140px; }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 18px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 4px;
+    cursor: none;
+    margin-top: 8px;
+    transition: background 0.2s;
+  }
+  .submit-btn:hover { background: #e03500; }
+
+  /* FOOTER */
+  footer {
+    background: var(--black);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 60px 48px 40px;
+  }
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 60px;
+  }
+  .footer-brand .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 6px;
+    color: var(--white);
+  }
+  .footer-brand .logo span { color: var(--accent); }
+  .footer-brand p {
+    font-size: 13px;
+    color: var(--light);
+    line-height: 1.7;
+    margin-top: 16px;
+    font-weight: 300;
+  }
+  .footer-col h4 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--white);
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 10px; }
+  .footer-col ul li a {
+    color: var(--light);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+    cursor: none;
+  }
+  .footer-col ul li a:hover { color: var(--accent); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-bottom p {
+    font-size: 12px;
+    color: var(--light);
+    letter-spacing: 1px;
+  }
+  .footer-socials { display: flex; gap: 16px; }
+  .social-link {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--light);
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+    cursor: none;
+  }
+  .social-link:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .page.active .hero-tag { animation: fadeUp 0.6s ease 0.1s both; }
+  .page.active .hero-title { animation: fadeUp 0.6s ease 0.2s both; }
+  .page.active .hero-desc { animation: fadeUp 0.6s ease 0.3s both; }
+  .page.active .hero-btns { animation: fadeUp 0.6s ease 0.4s both; }
+  .page.active .hero-stats { animation: fadeUp 0.6s ease 0.5s both; }
+
+  /* CART SIDEBAR */
+  .cart-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .cart-overlay.open { opacity: 1; pointer-events: all; }
+
+  .cart-sidebar {
+    position: fixed;
+    top: 0; right: 0;
+    width: 400px;
+    height: 100%;
+    background: var(--gray);
+    z-index: 201;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    flex-direction: column;
+  }
+  .cart-sidebar.open { transform: translateX(0); }
+
+  .cart-header {
+    padding: 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cart-header h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+  }
+  .cart-close {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--white);
+    width: 36px; height: 36px;
+    font-size: 18px;
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .cart-close:hover { border-color: var(--accent); color: var(--accent); }
+
+  .cart-items { flex: 1; overflow-y: auto; padding: 24px 32px; }
+  .cart-item {
+    display: flex;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .cart-item-img {
+    width: 80px; height: 60px;
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 28px;
+  }
+  .cart-item-info { flex: 1; }
+  .cart-item-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .cart-item-price {
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .cart-item-remove {
+    background: none;
+    border: none;
+    color: var(--light);
+    font-size: 18px;
+    cursor: none;
+    align-self: flex-start;
+    transition: color 0.2s;
+  }
+  .cart-item-remove:hover { color: var(--accent); }
+
+  .cart-footer {
+    padding: 24px 32px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .cart-total span:first-child {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--light);
+  }
+  .cart-total span:last-child {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--white);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent);
+    color: var(--white);
+    padding: 14px 28px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    z-index: 300;
+    transition: transform 0.3s ease;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follow" id="cursorFollow"></div>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <h3>САГС</h3>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <p style="color:var(--light);font-size:13px;text-align:center;margin-top:40px;">Сагс хоосон байна</p>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span>Нийт дүн</span>
+      <span id="cartTotal">₮0</span>
+    </div>
+    <button class="submit-btn" style="margin:0" onclick="showToast('Захиалга амжилттай!')">ЗАХИАЛАХ</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">SOLE<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#" class="active" onclick="showPage('home',this)">Нүүр</a></li>
+    <li><a href="#" onclick="showPage('catalog',this)">Бараа</a></li>
+    <li><a href="#" onclick="showPage('about',this)">Бидний тухай</a></li>
+    <li><a href="#" onclick="showPage('contact',this)">Холбоо барих</a></li>
+  </ul>
+  <button class="nav-cart" onclick="toggleCart()">🛒 САГС <span id="cartCount" style="background:var(--black);padding:2px 8px;margin-left:4px;border-radius:0">0</span></button>
+</nav>
+
+<!-- ===== HOME PAGE ===== -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-tag">✦ 2025 Шинэ Цуглуулга</p>
+      <h1 class="hero-title">
+        ЗАГВАР,<br>
+        <span class="outline">ТАВ ТУХЫГ</span><br>
+        СОНГО
+      </h1>
+      <p class="hero-desc">Чанар болон таны сонголт. Дэлхийн шилдэг брэндүүдийг нэг дороос.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('catalog',null)">БАРАА ҮЗЭХ</button>
+        <button class="btn-ghost" onclick="showPage('about',null)">БИДНИЙ ТУХАЙ</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-bg-text">SOLE</div>
+      <img class="hero-shoe" src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/99486859-0ff3-46b4-949b-2d16af2ad421/AIR+FORCE+1+%2707.png" alt="Hero Shoe" onerror="this.src='';this.style.fontSize='120px';this.style.lineHeight='1';this.textContent='👟'">
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">500<span>+</span></div>
+        <div class="stat-label">Загвар</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">20<span>+</span></div>
+        <div class="stat-label">Брэнд</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">10K<span>+</span></div>
+        <div class="stat-label">Худалдан авагч</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee-bar">
+    <div class="marquee-inner">
+      <span>NIKE</span><span>ADIDAS</span><span>NEW BALANCE</span><span>VANS</span><span>CONVERSE</span><span>JORDAN</span><span>PUMA</span><span>REEBOK</span>
+      <span>NIKE</span><span>ADIDAS</span><span>NEW BALANCE</span><span>VANS</span><span>CONVERSE</span><span>JORDAN</span><span>PUMA</span><span>REEBOK</span>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">ШИЛДЭГ<br><span>БАРААНУУД</span></h2>
+      <span class="section-sub" onclick="showPage('catalog',null)">БҮГДИЙГ ХАРАХ →</span>
+    </div>
+    <div class="products-grid" id="homeProducts"></div>
+  </section>
+
+  <div class="banner-strip">
+    <div class="banner-content">
+      <p class="banner-tag">✦ Онцлох Санал</p>
+      <h2 class="banner-title">JORDAN<br>SERIES<br>2025</h2>
+      <p class="banner-desc">Шинэ Jordan цуглуулга ирлээ. Сонгодог загвар, орчин үеийн технологи нэгдсэн.</p>
+      <button class="btn-primary" onclick="showPage('catalog',null)">ОДОО АВАХ</button>
+    </div>
+    <div class="banner-img">
+      <img src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/b7d9211c-eded-4a7a-bb53-3cf46218c1fe/AIR+JORDAN+1+RETRO+HIGH+OG.png" alt="Jordan" onerror="this.textContent='👟';this.style.fontSize='120px'">
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">SOLE<span style="color:var(--accent)">.</span></div>
+        <p>Монголын хамгийн том пүүз, гутлын дэлгүүр. Чанар, загвар, тав тух.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Цэс</h4>
+        <ul>
+          <li><a href="#" onclick="showPage('home',null)">Нүүр</a></li>
+          <li><a href="#" onclick="showPage('catalog',null)">Бараа</a></li>
+          <li><a href="#" onclick="showPage('about',null)">Бидний тухай</a></li>
+          <li><a href="#" onclick="showPage('contact',null)">Холбоо барих</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Брэнд</h4>
+        <ul>
+          <li><a href="#">Nike</a></li>
+          <li><a href="#">Adidas</a></li>
+          <li><a href="#">New Balance</a></li>
+          <li><a href="#">Jordan</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Тусламж</h4>
+        <ul>
+          <li><a href="#">Хэмжээний хүснэгт</a></li>
+          <li><a href="#">Буцаалт</a></li>
+          <li><a href="#">Хүргэлт</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 SOLE. Бүх эрх хуулиар хамгаалагдсан.</p>
+      <div class="footer-socials">
+        <a class="social-link" href="#">f</a>
+        <a class="social-link" href="#">in</a>
+        <a class="social-link" href="#">ig</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ===== CATALOG PAGE ===== -->
+<div class="page" id="page-catalog">
+  <div class="catalog-hero">
+    <h1>БҮХ<br><span>БАРАА</span></h1>
+    <p>500+ загвар • 20+ брэнд • Шуурхай хүргэлт</p>
+  </div>
+  <div class="catalog-layout">
+    <div class="filters">
+      <div class="filter-group">
+        <p class="filter-title">Брэнд</p>
+        <div class="filter-item"><input type="checkbox" id="nike" checked><label for="nike">Nike</label></div>
+        <div class="filter-item"><input type="checkbox" id="adidas" checked><label for="adidas">Adidas</label></div>
+        <div class="filter-item"><input type="checkbox" id="nb" checked><label for="nb">New Balance</label></div>
+        <div class="filter-item"><input type="checkbox" id="jordan"><label for="jordan">Jordan</label></div>
+        <div class="filter-item"><input type="checkbox" id="vans"><label for="vans">Vans</label></div>
+        <div class="filter-item"><input type="checkbox" id="converse"><label for="converse">Converse</label></div>
+      </div>
+      <div class="filter-group">
+        <p class="filter-title">Хэмжээ</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <div id="sizes"></div>
+        </div>
+      </div>
+      <div class="filter-group">
+        <p class="filter-title">Үнийн хязгаар</p>
+        <div class="price-range">
+          <input type="range" class="range-input" min="0" max="1000000" value="1000000" oninput="updatePrice(this.value)">
+          <div class="range-labels">
+            <span>₮0</span>
+            <span id="priceLabel">₮1,000,000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="catalog-products">
+      <div class="catalog-toolbar">
+        <p class="result-count" id="resultCount">12 бараа олдлоо</p>
+        <select class="sort-select">
+          <option>Шинэ нь эхэнд</option>
+          <option>Үнэ: Бага → Их</option>
+          <option>Үнэ: Их → Бага</option>
+          <option>Шилдэг</option>
+        </select>
+      </div>
+      <div class="catalog-grid" id="catalogProducts"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ABOUT PAGE ===== -->
+<div class="page" id="page-about">
+  <div class="about-hero">
+    <div class="about-hero-content">
+      <h1>БИДНИЙ<br><em>ТУХАЙ</em></h1>
+      <p>SOLE нь 2018 оноос эхлэн Монголчуудад дэлхийн шилдэг пүүз, гутлыг хүргэж ирсэн. Бид зөвхөн чанарт итгэдэг.</p>
+    </div>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-block">
+      <h2>МАНАЙ <span>ЭРХЭМ</span><br>ЗОРИЛГО</h2>
+      <p>Монгол хүн бүр дэлхийн шилдэг брэндийн жинхэнэ бараанд хүрч чадах ёстой гэдэгт бид итгэдэг. Хуурамч бараа, хэт өндөр үнэгүй — зөвхөн жинхэнэ чанар.</p>
+      <ul class="values-list">
+        <li>100% Жинхэнэ бараа</li>
+        <li>Шуурхай хүргэлт</li>
+        <li>Найдвартай баталгаа</li>
+        <li>Үйлчлүүлэгч эрхэмлэл</li>
+      </ul>
+    </div>
+    <div class="about-block dark">
+      <h2>7 ЖИЛ<br>ИТГЭЛТ</h2>
+      <p>2018 оноос хойш 10,000 гаруй үйлчлүүлэгчтэй болж, найдвартай брэнд болон өссөн. Манай амжилт бол таны итгэл.</p>
+      <ul class="values-list">
+        <li>10,000+ Баяр хэрэглэгч</li>
+        <li>500+ Загвар</li>
+        <li>20+ Брэнд</li>
+        <li>3 Дэлгүүр (УБ)</li>
+      </ul>
+    </div>
+    <div class="about-block dark" style="background:var(--gray)">
+      <h2>БИДНИЙ <span>ТҮҮХ</span></h2>
+      <p>SOLE-ийг үүсгэн байгуулагч Б.Болд 2018 онд найзуудынхаа хүсэлтээр Nike гутал авчирч эхэлсэн. Жилийн дотор жижиг дэлгүүр нь Монголын хамгийн найдвартай sneaker store болж хувирав.</p>
+    </div>
+    <div class="about-block">
+      <h2>ХААНА <span>БАЙДАГ</span> ВЭ?</h2>
+      <p>Бид Улаанбаатар хотын 3 байршилд үйл ажиллагаагаа явуулж байна. Мөн онлайн захиалга авч, бүх аймагт хүргэдэг.</p>
+      <ul class="values-list">
+        <li>СБД, Найрамдал — Төв дэлгүүр</li>
+        <li>БГД, State Department Store</li>
+        <li>ХУД, Nomin Mall</li>
+        <li>Бүх аймагт хүргэлт</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="team-section">
+    <h2 class="section-title">МАНАЙ <span style="color:var(--accent)">БАГ</span></h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar">Б</div>
+        <div class="team-info">
+          <div class="team-name">Б. БОЛД</div>
+          <div class="team-role">Үүсгэн байгуулагч</div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">Э</div>
+        <div class="team-info">
+          <div class="team-name">Э. ЭНХЖИН</div>
+          <div class="team-role">Борлуулалтын менежер</div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">Д</div>
+        <div class="team-info">
+          <div class="team-name">Д. ДАВАА</div>
+          <div class="team-role">Дизайнер</div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">М</div>
+        <div class="team-info">
+          <div class="team-name">М. МӨН</div>
+          <div class="team-role">Хүргэлтийн хариуцагч</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONTACT PAGE ===== -->
+<div class="page" id="page-contact">
+  <div class="contact-layout">
+    <div class="contact-left">
+      <h1>ХОЛБОО<br>БАРИХ</h1>
+      <p>Захиалга, асуулт, санал хүсэлтийн хувьд бидэнтэй холбоо барина уу. Бид 24 цагийн дотор хариу өгнө.</p>
+      <ul class="contact-details">
+        <li>
+          <span class="c-label">Хаяг</span>
+          <span class="c-value">СБД 3-р хороо, Найрамдал, УБ</span>
+        </li>
+        <li>
+          <span class="c-label">Утас</span>
+          <span class="c-value">+976 9911 2233</span>
+        </li>
+        <li>
+          <span class="c-label">Имэйл</span>
+          <span class="c-value">info@sole.mn</span>
+        </li>
+        <li>
+          <span class="c-label">Ажлын цаг</span>
+          <span class="c-value">Да–Ба: 10:00–20:00</span>
+        </li>
+      </ul>
+    </div>
+    <div class="contact-right">
+      <h2>МЕССЕЖ ИЛГЭЭХ</h2>
+      <div class="form-group">
+        <label class="form-label">Таны нэр</label>
+        <input type="text" class="form-input" placeholder="Жишээ: Б.Болд">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Утасны дугаар</label>
+        <input type="text" class="form-input" placeholder="+976 XXXX XXXX">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Сэдэв</label>
+        <input type="text" class="form-input" placeholder="Яг юуны тухай асуух вэ?">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Мессеж</label>
+        <textarea class="form-textarea" placeholder="Дэлгэрэнгүй бичнэ үү..."></textarea>
+      </div>
+      <button class="submit-btn" onclick="showToast('Мессеж илгээгдлээ!')">ИЛГЭЭХ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // CURSOR
+  const cursor = document.getElementById('cursor');
+  const follow = document.getElementById('cursorFollow');
+  let fx = 0, fy = 0, cx = 0, cy = 0;
+  document.addEventListener('mousemove', e => {
+    cx = e.clientX; cy = e.clientY;
+    cursor.style.left = cx - 6 + 'px';
+    cursor.style.top = cy - 6 + 'px';
+  });
+  function animFollow() {
+    fx += (cx - fx) * 0.12;
+    fy += (cy - fy) *.12;
+    follow.style.left = fx - 18 + 'px';
+    follow.style.top = fy - 18 + 'px';
+    requestAnimationFrame(animFollow);
+  }
+  animFollow();
+
+  // PRODUCTS DATA
+  // ЗУРАГ СОЛИХ ЗААВАР:
+  // img талбарт зургийн замыг бичнэ үү.
+  // Жишээ: img:'images/airforce1.jpg'
+  // HTML файлтай ижил хавтаст "images" фолдер үүсгээд зургаа хийнэ үү.
+  const products = [
+    { id:1,  brand:'Nike',        name:"Air Force 1 '07",       price:189000, badge:'Шинэ',          img:'images/shoe1.jpg' },
+    { id:2,  brand:'Adidas',      name:'Ultraboost 23',          price:245000, badge:'Хямдрал',        img:'images/shoe2.jpg' },
+    { id:3,  brand:'New Balance', name:'574 Core',               price:159000, badge:null,             img:'images/shoe3.jpg' },
+    { id:4,  brand:'Jordan',      name:'Air Jordan 1 Retro',     price:320000, badge:'Хязгаарлагдмал', img:'images/shoe4.jpg' },
+    { id:5,  brand:'Vans',        name:'Old Skool Pro',          price:129000, badge:null,             img:'images/shoe5.jpg' },
+    { id:6,  brand:'Converse',    name:'Chuck Taylor All Star',  price:99000,  badge:'Бестселлер',     img:'images/shoe6.jpg' },
+    { id:7,  brand:'Nike',        name:'React Element 55',       price:199000, badge:null,             img:'images/shoe7.jpg' },
+    { id:8,  brand:'Adidas',      name:'Stan Smith OG',          price:149000, badge:'Шинэ',           img:'images/shoe8.jpg' },
+    { id:9,  brand:'Puma',        name:'RS-X Toys',              price:139000, badge:null,             img:'images/shoe9.jpg' },
+    { id:10, brand:'Reebok',      name:'Classic Leather',        price:119000, badge:null,             img:'images/shoe10.jpg' },
+    { id:11, brand:'Nike',        name:'Dunk Low Retro',         price:229000, badge:'Хит',            img:'images/shoe11.jpg' },
+    { id:12, brand:'New Balance', name:'990v5 Made in USA',      price:389000, badge:'Онцлох',         img:'images/shoe12.jpg' },
+  ];
+
+  const cart = [];
+
+  function makeCard(p, small=false) {
+    return `
+    <div class="product-card">
+      <div class="product-img-wrap" style="background:linear-gradient(135deg,#1a1a1a,#222);height:${small?220:280}px">
+        <img src="${p.img}" alt="${p.name}"
+          style="width:85%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5));transition:transform 0.5s ease;"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div style="display:none;font-size:${small?80:100}px;width:100%;height:100%;align-items:center;justify-content:center">👟</div>
+        ${p.badge?`<div class="product-badge">${p.badge}</div>`:''}
+        <div class="product-overlay">
+          <button class="overlay-btn" onclick="addToCart(${p.id})">+ САГСАНД НЭМЭХ</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">${p.brand}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-footer">
+          <div class="product-price"><span class="currency">₮</span>${p.price.toLocaleString()}</div>
+          <button class="add-btn" onclick="addToCart(${p.id})">+</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Render home (first 6)
+  document.getElementById('homeProducts').innerHTML = products.slice(0,6).map(p=>makeCard(p)).join('');
+  // Render catalog (all)
+  document.getElementById('catalogProducts').innerHTML = products.map(p=>makeCard(p,true)).join('');
+
+  // Sizes
+  const sizeEl = document.getElementById('sizes');
+  [38,39,40,41,42,43,44,45].forEach(s => {
+    sizeEl.innerHTML += `<label style="display:inline-flex;align-items:center;gap:6px;margin-right:8px;margin-bottom:8px;cursor:auto">
+      <input type="checkbox" style="accent-color:var(--accent)"> 
+      <span style="font-size:13px;color:var(--white)">${s}</span>
+    </label>`;
+  });
+
+  // CART
+  function addToCart(id) {
+    const p = products.find(x=>x.id===id);
+    cart.push(p);
+    renderCart();
+    showToast(`${p.name} нэмэгдлээ!`);
+  }
+
+  function renderCart() {
+    const el = document.getElementById('cartItems');
+    const countEl = document.getElementById('cartCount');
+    const totalEl = document.getElementById('cartTotal');
+    countEl.textContent = cart.length;
+    if(cart.length === 0) {
+      el.innerHTML = '<p style="color:var(--light);font-size:13px;text-align:center;margin-top:40px;">Сагс хоосон байна</p>';
+      totalEl.textContent = '₮0';
+      return;
+    }
+    el.innerHTML = cart.map((p,i)=>`
+      <div class="cart-item">
+        <div class="cart-item-img">${p.emoji}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${p.name}</div>
+          <div class="cart-item-price">₮${p.price.toLocaleString()}</div>
+        </div>
+        <button class="cart-item-remove" onclick="removeFromCart(${i})">✕</button>
+      </div>
+    `).join('');
+    const total = cart.reduce((a,b)=>a+b.price,0);
+    totalEl.textContent = '₮' + total.toLocaleString();
+  }
+
+  function removeFromCart(i) {
+    cart.splice(i,1);
+    renderCart();
+  }
+
+  function toggleCart() {
+    document.getElementById('cartSidebar').classList.toggle('open');
+    document.getElementById('cartOverlay').classList.toggle('open');
+  }
+
+  // PAGES
+  function showPage(name, linkEl) {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+    document.getElementById('page-'+name).classList.add('active');
+    if(linkEl) linkEl.classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  // PRICE
+  function updatePrice(val) {
+    document.getElementById('priceLabel').textContent = '₮' + parseInt(val).toLocaleString();
+  }
+
+  // TOAST
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>
